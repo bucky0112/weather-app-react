@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import styled from '@emotion/styled';
 
 const Container = styled.div`
@@ -15,7 +16,7 @@ const WeatherCard = styled.div`
   background-color: #f9f9f9;
 `;
 
-function App() {
+function App(): React.Node {
   return (
     <Container>
       <WeatherCard>
