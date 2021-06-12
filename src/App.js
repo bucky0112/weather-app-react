@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import { ThemeProvider } from '@emotion/react'
+import dayjs from 'dayjs';
 
 // component as icon
 import { ReactComponent as DayCloudyIcon } from './assets/images/day-cloudy.svg';
@@ -147,7 +148,7 @@ function App() {
     return new Intl.DateTimeFormat('zh-tw', {
       hour: 'numeric',
       minute: 'numeric',
-    }).format(new Date(currentWeather.observationTime))
+    }).format(dayjs(currentWeather.observationTime))
   })();
 
   return (
