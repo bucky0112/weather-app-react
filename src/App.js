@@ -131,6 +131,10 @@ const theme = {
 };
 // setup theme color end ==========
 
+// weather API Info
+const Authorization_KEY = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
+const LOCATION_NAME = "臺北";
+
 function App() {
   const [currentTheme, setTheme] = useState('light');
 
@@ -143,6 +147,7 @@ function App() {
     observationTime: "2021-06-12 22:56"
   });
 
+  // 處理溫度以及時間資訊
   const currentTemperature = (() => Math.round(currentWeather.temperature))();
   const currentTime = (() => {
     return new Intl.DateTimeFormat('zh-tw', {
@@ -150,6 +155,15 @@ function App() {
       minute: 'numeric',
     }).format(dayjs(currentWeather.observationTime))
   })();
+
+  // fetch API
+  const handleGetWeather = ()  => {
+    fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${Authorization_KEY}&locationName=${LOCATION_NAME}`)
+      .then((res) => res.json())
+      .then((data) => {
+      console.log('data', data);
+    })
+  }
 
   return (
     <ThemeProvider theme={theme[currentTheme]}>
@@ -165,7 +179,7 @@ function App() {
           </CurrentWeather>
           <AirFlow><AirFlowIcon />{currentWeather.windSpeed} m/h</AirFlow>
           <Rain><RainIcon />{currentWeather.rainChance} %</Rain>
-          <Refresh>最後觀測時間：{currentTime}<RefreshIcon /></Refresh>
+          <Refresh>最後觀測時間：{currentTime}<RefreshIcon onClick={handleGetWeather} /></Refresh>
         </WeatherCard>
       </Container>
     </ThemeProvider>
