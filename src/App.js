@@ -1,5 +1,6 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
+import { ThemeProvider } from '@emotion/react'
 
 // component as icon
 import { ReactComponent as DayCloudyIcon } from './assets/images/day-cloudy.svg';
@@ -9,8 +10,7 @@ import { ReactComponent as RefreshIcon } from './assets/images/refresh.svg';
 
 // style component start ==============
 const Container = styled.div`
-  /* background-color: #ededed; */
-  background-color: ${(props) => props.theme.backgroundColor};
+  background-color: ${({ theme }) => theme.backgroundColor};
   height: 100%;
   display: flex;
   align-items: center;
@@ -20,21 +20,21 @@ const Container = styled.div`
 const WeatherCard = styled.div`
   position: relative;
   min-width: 360px;
-  box-shadow: 0 1px 3px 0 #999999;
-  background-color: #f9f9f9;
+  box-shadow: ${({ theme }) => theme.boxShadow};
+  background-color: ${({ theme }) => theme.foregroundColor};
   box-sizing: border-box;
   padding: 30px 15px;
 `;
 
 const Location = styled.div`
   font-size: 28px;
-  color: #212121;
+  color: ${({ theme }) => theme.titleColor};
   margin-bottom: 20px;
 `;
 
 const Description = styled.div`
   font-size: 16px;
-  color: #828282;
+  color: ${({ theme }) => theme.textColor};
   margin-bottom: 30px;
 `;
 
@@ -46,7 +46,7 @@ const CurrentWeather = styled.div`
 `;
 
 const Temperature = styled.div`
-  color: #757575;
+  color: ${({ theme }) => theme.temperatureColor};
   font-size: 96px;
   font-weight: 300;
   display: flex;
@@ -62,8 +62,9 @@ const AirFlow = styled.div`
   align-items: center;
   font-size: 16x;
   font-weight: 300;
-  color: #828282;
+  color: ${({ theme }) => theme.textColor};
   margin-bottom: 20px;
+
   svg {
     width: 25px;
     height: auto;
@@ -76,12 +77,17 @@ const Rain = styled.div`
   align-items: center;
   font-size: 16x;
   font-weight: 300;
-  color: #828282;
+  color: ${({ theme }) => theme.textColor};
+
   svg {
     width: 25px;
     height: auto;
     margin-right: 30px;
   }
+`;
+
+const DayCloudy = styled(DayCloudyIcon)`
+  flex-basis: 30%;
 `;
 
 const Refresh = styled.div`
@@ -91,17 +97,14 @@ const Refresh = styled.div`
   font-size: 12px;
   display: inline-flex;
   align-items: flex-end;
-  color: #828282;
+  color: ${({ theme }) => theme.textColor};
+
   svg {
     margin-left: 10px;
     width: 15px;
     height: 15px;
     cursor: pointer;
   }
-`;
-
-const DayCloudy = styled(DayCloudyIcon)`
-  flex-basis: 30%;
 `;
 // style component end ==============
 
@@ -127,23 +130,44 @@ const theme = {
 };
 // setup theme color end ==========
 
-function App(): React.Node {
+function App() {
+  const [currentTheme, setTheme] = useState('light');
+
+  const [currentWeather, setWeather] = useState({
+    locationName: "彰化縣",
+    description: "多雲時晴",
+    temperature: 22.9,
+    windSpeed: 23,
+    rainChance: 48,
+    observationTime: "2021-06-12 22:56"
+  });
+
+  const currentTemperature = (() => Math.round(currentWeather.temperature))();
+  const currentTime = (() => {
+    return new Intl.DateTimeFormat('zh-tw', {
+      hour: 'numeric',
+      minute: 'numeric',
+    }).format(new Date(currentWeather.observationTime))
+  })();
+
   return (
-    <Container theme={theme.dark}>
-      <WeatherCard>
-        <Location>彰化縣</Location>
-        <Description>多雲時晴</Description>
-        <CurrentWeather>
-          <Temperature>
-            23 <Celsius>°C</Celsius>
-          </Temperature>
-          <DayCloudy />
-        </CurrentWeather>
-        <AirFlow><AirFlowIcon />23 m/h</AirFlow>
-        <Rain><RainIcon />48 %</Rain>
-        <Refresh>最後觀測時間：上午 12:03<RefreshIcon /></Refresh>
-      </WeatherCard>
-    </Container>
+    <ThemeProvider theme={theme[currentTheme]}>
+      <Container>
+        <WeatherCard>
+          <Location>{currentWeather.locationName}</Location>
+          <Description>{currentWeather.description}</Description>
+          <CurrentWeather>
+            <Temperature>
+              {currentTemperature} <Celsius>°C</Celsius>
+            </Temperature>
+            <DayCloudy />
+          </CurrentWeather>
+          <AirFlow><AirFlowIcon />{currentWeather.windSpeed} m/h</AirFlow>
+          <Rain><RainIcon />{currentWeather.rainChance} %</Rain>
+          <Refresh>最後觀測時間：{currentTime}<RefreshIcon /></Refresh>
+        </WeatherCard>
+      </Container>
+    </ThemeProvider>
   );
 }
 
