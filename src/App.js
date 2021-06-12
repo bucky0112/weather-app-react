@@ -25,7 +25,7 @@ const WeatherCard = styled.div`
 
 const Location = styled.div`
   font-size: 28px;
-  color: #212121;
+  color: ${props => props.theme === 'dark' ? '#dadada' : '#212121'};
   margin-bottom: 20px;
 `;
 
@@ -105,16 +105,16 @@ function App(): React.Node {
   return (
     <Container>
       <WeatherCard>
-        <Location>彰化縣</Location>
+        <Location theme='dark'>彰化縣</Location>
         <Description>多雲時晴</Description>
         <CurrentWeather>
           <Temperature>
-            23 <Celsius>。C</Celsius>
+            23 <Celsius>°C</Celsius>
           </Temperature>
           <DayCloudy />
         </CurrentWeather>
         <AirFlow><AirFlowIcon />23 m/h</AirFlow>
-        <Rain><RainIcon />48%</Rain>
+        <Rain><RainIcon />48 %</Rain>
         <Refresh>最後觀測時間：上午 12:03<RefreshIcon /></Refresh>
       </WeatherCard>
     </Container>
