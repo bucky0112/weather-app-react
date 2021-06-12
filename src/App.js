@@ -133,7 +133,7 @@ const theme = {
 
 // weather API Info
 const Authorization_KEY = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
-const LOCATION_NAME = "臺北";
+const LOCATION_NAME = "臺中"; // 觀測站名稱
 
 function App() {
   const [currentTheme, setTheme] = useState('light');
@@ -162,6 +162,26 @@ function App() {
       .then((res) => res.json())
       .then((data) => {
       console.log('data', data);
+      const locationData = data.records.location[0];
+      // 風速&溫度取得
+      const weatherElements = locationData.weatherElement.reduce(
+        (needInfo, item) => {
+          if (['WDSD', 'TEMP'].includes(item.elementName)) {
+            needInfo[item.elementName] = item.elementValue;
+          }
+          return needInfo;
+        }, {}
+      );
+      // data into state
+      setWeather({
+        locationName: locationData.locationName,
+        description: "多雲時晴",
+        temperature: weatherElements.TEMP,
+        windSpeed: weatherElements.WDSD,
+        rainChance: 48,
+        observationTime: locationData.time.obsTime
+      });
+      console.log(currentWeather);
     })
   }
 
