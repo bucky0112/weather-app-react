@@ -157,32 +157,32 @@ function App() {
   })();
 
   // fetch API
-  const handleGetWeather = ()  => {
+  const handleGetWeather = () => {
     fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${Authorization_KEY}&locationName=${LOCATION_NAME}`)
       .then((res) => res.json())
       .then((data) => {
-      console.log('data', data);
-      const locationData = data.records.location[0];
-      // 風速&溫度取得
-      const weatherElements = locationData.weatherElement.reduce(
-        (needInfo, item) => {
-          if (['WDSD', 'TEMP'].includes(item.elementName)) {
-            needInfo[item.elementName] = item.elementValue;
-          }
-          return needInfo;
-        }, {}
-      );
-      // data into state
-      setWeather({
-        locationName: locationData.locationName,
-        description: "多雲時晴",
-        temperature: weatherElements.TEMP,
-        windSpeed: weatherElements.WDSD,
-        rainChance: 48,
-        observationTime: locationData.time.obsTime
-      });
-      console.log(currentWeather);
-    })
+        const locationData = data.records.location[0];
+        // 風速&溫度取得
+        const weatherElements = locationData.weatherElement.reduce(
+          (needInfo, item) => {
+            if (['WDSD', 'TEMP'].includes(item.elementName)) {
+              needInfo[item.elementName] = item.elementValue;
+            }
+            return needInfo;
+          }, {}
+        );
+        // data into state
+        setWeather({
+          locationName: locationData.locationName,
+          description: "多雲時晴",
+          temperature: weatherElements.TEMP,
+          windSpeed: weatherElements.WDSD,
+          rainChance: 48,
+          observationTime: locationData.time.obsTime
+        });
+      }).catch((err) => {
+        console.log('Error', err);
+      })
   }
 
   return (
