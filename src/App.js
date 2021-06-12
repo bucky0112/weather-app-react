@@ -1,13 +1,16 @@
 import * as React from 'react';
 import styled from '@emotion/styled';
 
+// component as icon
 import { ReactComponent as DayCloudyIcon } from './assets/images/day-cloudy.svg';
 import { ReactComponent as AirFlowIcon } from './assets/images/airFlow.svg';
 import { ReactComponent as RainIcon } from './assets/images/rain.svg';
 import { ReactComponent as RefreshIcon } from './assets/images/refresh.svg';
 
+// style component start ==============
 const Container = styled.div`
-  background-color: #ededed;
+  /* background-color: #ededed; */
+  background-color: ${(props) => props.theme.backgroundColor};
   height: 100%;
   display: flex;
   align-items: center;
@@ -25,7 +28,7 @@ const WeatherCard = styled.div`
 
 const Location = styled.div`
   font-size: 28px;
-  color: ${props => props.theme === 'dark' ? '#dadada' : '#212121'};
+  color: #212121;
   margin-bottom: 20px;
 `;
 
@@ -100,12 +103,35 @@ const Refresh = styled.div`
 const DayCloudy = styled(DayCloudyIcon)`
   flex-basis: 30%;
 `;
+// style component end ==============
+
+// setup theme color start ==========
+const theme = {
+  light: {
+    backgroundColor: '#ededed',
+    foregroundColor: '#f9f9f9',
+    boxShadow: '0 1px 3px 0 #999999',
+    titleColor: '#212121',
+    temperatureColor: '#757575',
+    textColor: '#828282',
+  },
+  dark: {
+    backgroundColor: '#1F2022',
+    foregroundColor: '#121416',
+    boxShadow:
+      '0 1px 4px 0 rgba(12, 12, 13, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.15)',
+    titleColor: '#f9f9fa',
+    temperatureColor: '#dddddd',
+    textColor: '#cccccc',
+  },
+};
+// setup theme color end ==========
 
 function App(): React.Node {
   return (
-    <Container>
+    <Container theme={theme.dark}>
       <WeatherCard>
-        <Location theme='dark'>彰化縣</Location>
+        <Location>彰化縣</Location>
         <Description>多雲時晴</Description>
         <CurrentWeather>
           <Temperature>
