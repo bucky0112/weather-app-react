@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
-import { ThemeProvider } from '@emotion/react'
+import { ThemeProvider } from '@emotion/react';
 import dayjs from 'dayjs';
 
 // component as icon
@@ -8,6 +8,7 @@ import { ReactComponent as DayCloudyIcon } from './assets/images/day-cloudy.svg'
 import { ReactComponent as AirFlowIcon } from './assets/images/airFlow.svg';
 import { ReactComponent as RainIcon } from './assets/images/rain.svg';
 import { ReactComponent as RefreshIcon } from './assets/images/refresh.svg';
+import { ReactComponent as LoadingIcon } from './assets/images/loading.svg';
 
 // style component start ==============
 const Container = styled.div`
@@ -99,12 +100,22 @@ const Refresh = styled.div`
   display: inline-flex;
   align-items: flex-end;
   color: ${({ theme }) => theme.textColor};
+  @keyframes rotate {
+    from {
+      transform: rotate(360deg);
+    }
+    to {
+      transform: rotate(0deg)
+    }
+  }
 
   svg {
     margin-left: 10px;
     width: 15px;
     height: 15px;
     cursor: pointer;
+    animation: rotate infinite 1.5s linear;
+    animation-duration: ${({ isLoading }) => (isLoading ? '1.5s' : '0s')};
   }
 `;
 // style component end ==============
@@ -136,6 +147,10 @@ const Authorization_KEY = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
 const LOCATION_NAME = "臺中"; // 觀測站名稱
 
 function App() {
+  useEffect(() => {
+    fetchGetWeather();
+  }, []);
+
   const [currentTheme, setTheme] = useState('light');
 
   const [currentWeather, setWeather] = useState({
@@ -144,7 +159,8 @@ function App() {
     temperature: 22.9,
     windSpeed: 23,
     rainChance: 48,
-    observationTime: "2021-06-12 22:56"
+    observationTime: "2021-06-12 22:56",
+    isLoading: true
   });
 
   // 處理溫度以及時間資訊
@@ -157,7 +173,14 @@ function App() {
   })();
 
   // fetch API
-  const handleGetWeather = () => {
+  const fetchGetWeather = () => {
+    setWeather((prevState) => {
+      return ({
+        ...prevState,
+        isLoading: true
+      })
+    });
+
     fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${Authorization_KEY}&locationName=${LOCATION_NAME}`)
       .then((res) => res.json())
       .then((data) => {
@@ -178,28 +201,43 @@ function App() {
           temperature: weatherElements.TEMP,
           windSpeed: weatherElements.WDSD,
           rainChance: 48,
-          observationTime: locationData.time.obsTime
+          observationTime: locationData.time.obsTime,
+          isLoading: false
         });
       }).catch((err) => {
         console.log('Error', err);
       })
   }
 
+  const {
+    locationName,
+    description,
+    windSpeed,
+    rainChance,
+    isLoading
+  } = currentWeather
+
   return (
     <ThemeProvider theme={theme[currentTheme]}>
       <Container>
         <WeatherCard>
-          <Location>{currentWeather.locationName}</Location>
-          <Description>{currentWeather.description}</Description>
+          <Location>{locationName}</Location>
+          <Description>{description}</Description>
           <CurrentWeather>
             <Temperature>
               {currentTemperature} <Celsius>°C</Celsius>
             </Temperature>
             <DayCloudy />
           </CurrentWeather>
-          <AirFlow><AirFlowIcon />{currentWeather.windSpeed} m/h</AirFlow>
-          <Rain><RainIcon />{currentWeather.rainChance} %</Rain>
-          <Refresh>最後觀測時間：{currentTime}<RefreshIcon onClick={handleGetWeather} /></Refresh>
+          <AirFlow><AirFlowIcon />{windSpeed} m/h</AirFlow>
+          <Rain><RainIcon />{rainChance} %</Rain>
+          <Refresh 
+            onClick={fetchGetWeather}
+            isLoading={isLoading}
+          >
+            最後觀測時間：{currentTime}
+            {isLoading ? <LoadingIcon /> : <RefreshIcon /> }
+          </Refresh>
         </WeatherCard>
       </Container>
     </ThemeProvider>
