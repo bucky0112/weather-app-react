@@ -145,22 +145,26 @@ const theme = {
 // weather API Info
 const Authorization_KEY = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
 const LOCATION_NAME = "臺中"; // 觀測站名稱
+const CITY_NAME = "臺中市";
 
 function App() {
   useEffect(() => {
     fetchGetWeather();
+    fetchGetCityWeather();
   }, []);
 
   const [currentTheme, setTheme] = useState('light');
 
   const [currentWeather, setWeather] = useState({
-    locationName: "彰化縣",
-    description: "多雲時晴",
-    temperature: 22.9,
-    windSpeed: 23,
-    rainChance: 48,
-    observationTime: "2021-06-12 22:56",
-    isLoading: true
+    locationName: "",
+    description: "",
+    temperature: 0,
+    windSpeed: 0,
+    rainChance: 0,
+    observationTime: new Date(),
+    isLoading: true,
+    comfortable: '',
+    weatherCode: 0,
   });
 
   // 處理溫度以及時間資訊
@@ -172,7 +176,7 @@ function App() {
     }).format(dayjs(currentWeather.observationTime))
   })();
 
-  // fetch API
+  // fetch 氣象站 API
   const fetchGetWeather = () => {
     setWeather((prevState) => {
       return ({
@@ -195,6 +199,12 @@ function App() {
           }, {}
         );
         // data into state
+        setWeather((prevState) => {
+          return ({
+            ...prevState,
+            isLoading: true
+          })
+        });
         setWeather({
           locationName: locationData.locationName,
           description: "多雲時晴",
@@ -209,20 +219,47 @@ function App() {
       })
   }
 
+  // fetch 城市天氣 API
+  const fetchGetCityWeather = () => {
+    fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=${Authorization_KEY}&locationName=${CITY_NAME}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const locationData = data.records.location[0];
+        // 取得天氣現象、降雨機率、舒適度
+        const weatherElements = locationData.weatherElement.reduce((needInfo, item) => {
+          if (['Wx', 'PoP', 'CI'].includes(item.elementName)) {
+            needInfo[item.elementName] = item.time[0].parameter;
+          }
+          return needInfo;
+        }, {});
+        // data to to date
+        setWeather((prevState) => {
+          return ({
+            ...prevState,
+            description: weatherElements.Wx.parameterName,
+            rainChance: weatherElements.PoP.parameterName,
+            comfortable: weatherElements.CI.parameterName,
+            weatherCode: weatherElements.Wx.parameterValue,
+          });
+        });
+      });
+  }
+
   const {
     locationName,
     description,
     windSpeed,
     rainChance,
-    isLoading
-  } = currentWeather
+    isLoading,
+    comfortable
+  } = currentWeather;
 
   return (
     <ThemeProvider theme={theme[currentTheme]}>
       <Container>
         <WeatherCard>
           <Location>{locationName}</Location>
-          <Description>{description}</Description>
+          <Description>{description} {comfortable}</Description>
           <CurrentWeather>
             <Temperature>
               {currentTemperature} <Celsius>°C</Celsius>
@@ -231,12 +268,15 @@ function App() {
           </CurrentWeather>
           <AirFlow><AirFlowIcon />{windSpeed} m/h</AirFlow>
           <Rain><RainIcon />{rainChance} %</Rain>
-          <Refresh 
-            onClick={fetchGetWeather}
+          <Refresh
+            onClick={() => {
+              fetchGetWeather();
+              fetchGetCityWeather();
+            }}
             isLoading={isLoading}
           >
             最後觀測時間：{currentTime}
-            {isLoading ? <LoadingIcon /> : <RefreshIcon /> }
+            {isLoading ? <LoadingIcon /> : <RefreshIcon />}
           </Refresh>
         </WeatherCard>
       </Container>
