@@ -261,7 +261,8 @@ function App() {
     windSpeed,
     rainChance,
     isLoading,
-    comfortable
+    comfortable,
+    weatherCode
   } = currentWeather;
 
   return (
@@ -274,7 +275,7 @@ function App() {
             <Temperature>
               {currentTemperature} <Celsius>°C</Celsius>
             </Temperature>
-            <WeatherIcon />
+            <WeatherIcon weatherCode={weatherCode} time="night" />
           </CurrentWeather>
           <AirFlow><AirFlowIcon />{windSpeed} m/h</AirFlow>
           <Rain><RainIcon />{rainChance} %</Rain>

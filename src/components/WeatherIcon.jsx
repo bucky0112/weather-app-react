@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled/';
 
 import { ReactComponent as DayCloudy } from './../assets/images/day-cloudy.svg';
@@ -16,7 +16,7 @@ import { ReactComponent as NightPartiallyClearWithRain } from './../assets/image
 import { ReactComponent as NightSnowing } from './../assets/images/night-snowing.svg';
 import { ReactComponent as NightThunderstorm } from './../assets/images/night-thunderstorm.svg';
 
-const Container = styled.div`
+const IconContainer = styled.div`
   flex-basis: 30%;
   svg {
     max-height: 110px;
@@ -77,12 +77,10 @@ const findWeatherType = (weatherCode) => {
   return weatherType;
 }
 
-console.log(findWeatherType(24));
+export default function WeatherIcon({ weatherCode, time }) {
+  const weatherType = useMemo(() => findWeatherType(weatherCode), [weatherCode]);
+  // const weatherType = findWeatherType(weatherCode);
+  const weatherIcon = weatherIcons[time][weatherType];
 
-export default function WeatherIcon() {
-  return (
-    <Container>
-      <DayCloudy />
-    </Container>
-  )
+  return <IconContainer>{weatherIcon}</IconContainer>
 }
