@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import { ThemeProvider } from '@emotion/react';
 import dayjs from 'dayjs';
+import WeatherIcon from './components/WeatherIcon';
 
 // component as icon
-import { ReactComponent as DayCloudyIcon } from './assets/images/day-cloudy.svg';
 import { ReactComponent as AirFlowIcon } from './assets/images/airFlow.svg';
 import { ReactComponent as RainIcon } from './assets/images/rain.svg';
 import { ReactComponent as RefreshIcon } from './assets/images/refresh.svg';
@@ -86,10 +86,6 @@ const Rain = styled.div`
     height: auto;
     margin-right: 30px;
   }
-`;
-
-const DayCloudy = styled(DayCloudyIcon)`
-  flex-basis: 30%;
 `;
 
 const Refresh = styled.div`
@@ -210,28 +206,29 @@ const fetchGetCityWeather = () => {
 }
 
 function App() {
-  useEffect(() => {
-    const fetchData = async () => {
-      // 開始前先把loading打開
-      setWeather((prev) => {
-        return {
-          ...prev,
-          isLoading: true,
-        }
-      });
-      // 透過陣列解構拿到promise回傳的資料
-      const [currentWeather, currentCityWeather] = await Promise.all([
-        fetchGetWeather(),
-        fetchGetCityWeather()
-      ]);
-      // 透過物件解構灌入資料
-      setWeather({
-        ...currentWeather,
-        ...currentCityWeather,
-        isLoading: false
-      });
+  // fetchData 因為需要共用，所以放在 useEffect 外面
+  const fetchData = async () => {
+    // 開始前先把loading打開
+    setWeather((prev) => {
+      return {
+        ...prev,
+        isLoading: true,
+      }
+    });
+    // 透過陣列解構拿到promise回傳的資料
+    const [currentWeather, currentCityWeather] = await Promise.all([
+      fetchGetWeather(),
+      fetchGetCityWeather()
+    ]);
+    // 透過物件解構灌入資料
+    setWeather({
+      ...currentWeather,
+      ...currentCityWeather,
+      isLoading: false
+    });
+  };
 
-    };
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -264,7 +261,8 @@ function App() {
     windSpeed,
     rainChance,
     isLoading,
-    comfortable
+    comfortable,
+    weatherCode
   } = currentWeather;
 
   return (
@@ -277,15 +275,12 @@ function App() {
             <Temperature>
               {currentTemperature} <Celsius>°C</Celsius>
             </Temperature>
-            <DayCloudy />
+            <WeatherIcon weatherCode={weatherCode} time="night" />
           </CurrentWeather>
           <AirFlow><AirFlowIcon />{windSpeed} m/h</AirFlow>
           <Rain><RainIcon />{rainChance} %</Rain>
           <Refresh
-            onClick={() => {
-              fetchGetWeather();
-              fetchGetCityWeather();
-            }}
+            onClick={fetchData}
             isLoading={isLoading}
           >
             最後觀測時間：{currentTime}
