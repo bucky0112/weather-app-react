@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { ThemeProvider } from '@emotion/react';
 import dayjs from 'dayjs';
 import WeatherIcon from './components/WeatherIcon';
+import { getMoment } from './utils/helpers';
 
 // component as icon
 import { ReactComponent as AirFlowIcon } from './assets/images/airFlow.svg';
@@ -145,13 +146,6 @@ const CITY_NAME = "臺中市";
 
 // fetch 氣象站 API
 const fetchGetWeather = () => {
-  // setWeather((prevState) => {
-  //   return ({
-  //     ...prevState,
-  //     isLoading: true
-  //   })
-  // });
-
   return fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${Authorization_KEY}&locationName=${LOCATION_NAME}`)
     .then((res) => res.json())
     .then((data) => {
@@ -254,6 +248,9 @@ function App() {
       minute: 'numeric',
     }).format(dayjs(currentWeather.observationTime))
   })();
+
+  const moment = getMoment(CITY_NAME);
+  console.log(moment);
 
   const {
     locationName,
