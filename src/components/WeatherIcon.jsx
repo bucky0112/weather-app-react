@@ -71,16 +71,21 @@ const weatherIcons = {
 };
 
 const findWeatherType = (weatherCode) => {
-  const [weatherType] = Object.entries(weatherTypes).find(([weatherType, weatherCodes]) => 
+  const [weatherType] = Object.entries(weatherTypes).find(([weatherType, weatherCodes]) =>
     weatherCodes.includes(Number(weatherCode))
   ) || [];
   return weatherType;
 }
 
-export default function WeatherIcon({ weatherCode, time }) {
+export default function WeatherIcon({ weatherCode, moment }) {
   const weatherType = useMemo(() => findWeatherType(weatherCode), [weatherCode]);
-  // const weatherType = findWeatherType(weatherCode);
-  const weatherIcon = weatherIcons[time][weatherType];
-
+  const weatherIcon = weatherIcons[moment][weatherType];
   return <IconContainer>{weatherIcon}</IconContainer>
 }
+// const WeatherIcon = ({ weatherCode, moment }) => {
+//   const weatherType = useMemo(() => findWeatherType(weatherCode), [weatherCode]);
+//   const weatherIcon = weatherIcons[moment][weatherType];
+//   return <IconContainer>{weatherIcon}</IconContainer>
+// }
+
+// export default WeatherIcon;
