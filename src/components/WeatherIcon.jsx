@@ -77,13 +77,10 @@ const findWeatherType = (weatherCode) => {
   return weatherType;
 }
 
-const WeatherIcon = ({ weatherCode, moment }) => {
-  const weatherType = useMemo(() => findWeatherType(weatherCode), [
-    weatherCode,
-  ]);
-  const weatherIcon = weatherIcons[moment][weatherType];
+export default function WeatherIcon({ weatherCode, time }) {
+  const weatherType = useMemo(() => findWeatherType(weatherCode), [weatherCode]);
+  // const weatherType = findWeatherType(weatherCode);
+  const weatherIcon = weatherIcons[time][weatherType];
 
-  return <IconContainer>{weatherIcon}</IconContainer>;
-};
-
-export default WeatherIcon;
+  return <IconContainer>{weatherIcon}</IconContainer>
+}
