@@ -8,10 +8,10 @@ export const getMoment = (locationName) => {
   );
 
   // STEP 3：找不到的話則拋出錯誤訊息
-  // if (!location) {
-  //   throw new Error(`找不到 ${location} 的日出日落資料`);
-  // }
-  if (!location) return null
+  if (!location) {
+    throw new Error(`找不到 ${location} 的日出日落資料`);
+  }
+  // if (!location) return null
 
   // STEP 4：取得當前時間
   const now = new Date();

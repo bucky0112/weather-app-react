@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { ThemeProvider } from '@emotion/react';
 import dayjs from 'dayjs';
@@ -142,7 +142,7 @@ const theme = {
 // weather API Info
 const Authorization_KEY = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
 const LOCATION_NAME = "臺中"; // 觀測站名稱
-const CITY_NAME = "臺中市";
+const CITY_NAME = "臺中市";
 
 // fetch 氣象站 API
 const fetchGetWeather = () => {
@@ -226,6 +226,13 @@ function App() {
     fetchData();
   }, []);
 
+  // 處理日出日落資訊
+  const moment = useMemo(() => getMoment(CITY_NAME), []);
+
+  useEffect(() => {
+    setTheme(moment === 'day' ? 'light' : 'dark')
+  }, [moment])
+
   const [currentTheme, setTheme] = useState('light');
 
   const [currentWeather, setWeather] = useState({
@@ -249,9 +256,6 @@ function App() {
     }).format(dayjs(currentWeather.observationTime))
   })();
 
-  const moment = getMoment(CITY_NAME);
-  console.log(moment);
-
   const {
     locationName,
     description,
@@ -272,7 +276,7 @@ function App() {
             <Temperature>
               {currentTemperature} <Celsius>°C</Celsius>
             </Temperature>
-            <WeatherIcon weatherCode={weatherCode} time="night" />
+            <WeatherIcon weatherCode={weatherCode} time={moment} />
           </CurrentWeather>
           <AirFlow><AirFlowIcon />{windSpeed} m/h</AirFlow>
           <Rain><RainIcon />{rainChance} %</Rain>
