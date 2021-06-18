@@ -107,7 +107,7 @@ const Refresh = styled.div`
 `;
 // style component end ==============
 
-export default function WeatherCard(currentWeather, moment, fetchData) {
+export default function WeatherCard({currentWeather, moment, fetchData}) {
   const {
     locationName,
     description,
