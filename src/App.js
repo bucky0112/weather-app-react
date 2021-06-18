@@ -273,7 +273,7 @@ function App() {
             <Temperature>
               {currentTemperature} <Celsius>°C</Celsius>
             </Temperature>
-            <WeatherIcon weatherCode={weatherCode} time={moment} />
+            <WeatherIcon weatherCode={weatherCode} moment={moment} />
           </CurrentWeather>
           <AirFlow><AirFlowIcon />{windSpeed} m/h</AirFlow>
           <Rain><RainIcon />{rainChance} %</Rain>
