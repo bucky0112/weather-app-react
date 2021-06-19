@@ -8,6 +8,7 @@ import { ReactComponent as AirFlowIcon } from './../assets/images/airFlow.svg';
 import { ReactComponent as RainIcon } from './../assets/images/rain.svg';
 import { ReactComponent as RefreshIcon } from './../assets/images/refresh.svg';
 import { ReactComponent as LoadingIcon } from './../assets/images/loading.svg';
+import { ReactComponent as CogIcon } from './../assets/images/cog.svg';
 
 // style component start ==============
 const WeatherCardWrapper = styled.div`
@@ -105,11 +106,25 @@ const Refresh = styled.div`
     animation-duration: ${({ isLoading }) => (isLoading ? '1.5s' : '0s')};
   }
 `;
+
+const Cog = styled(CogIcon)`
+  position: absolute;
+  top: 30px;
+  right: 15px;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+`;
 // style component end ==============
 
-export default function WeatherCard({currentWeather, moment, fetchData}) {
+export default function WeatherCard({
+  cityName,
+  currentWeather,
+  moment,
+  fetchData,
+  handleCurrentPageSwitch
+}) {
   const {
-    locationName,
     description,
     windSpeed,
     rainChance,
@@ -128,9 +143,15 @@ export default function WeatherCard({currentWeather, moment, fetchData}) {
     }).format(dayjs(currentWeather.observationTime))
   })();
 
+  // 處理切換頁面
+  const handleSwitch = () => {
+    handleCurrentPageSwitch('WeatherSetting')
+  }
+
   return (
     <WeatherCardWrapper>
-      <Location>{locationName}</Location>
+    <Cog onClick={handleSwitch} />
+      <Location>{cityName}</Location>
       <Description>{description} {comfortable}</Description>
       <CurrentWeather>
         <Temperature>

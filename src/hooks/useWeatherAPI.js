@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 
 
 // fetch 氣象站 API
-const fetchGetWeather = ({ Authorization_KEY, LOCATION_NAME }) => {
-  return fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${Authorization_KEY}&locationName=${LOCATION_NAME}`)
+const fetchGetWeather = ({ authorizationKey, locationName }) => {
+  return fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/O-A0003-001?Authorization=${authorizationKey}&locationName=${locationName}`)
     .then((res) => res.json())
     .then((data) => {
       const locationData = data.records.location[0];
@@ -32,8 +32,8 @@ const fetchGetWeather = ({ Authorization_KEY, LOCATION_NAME }) => {
 }
 
 // fetch 城市天氣 API
-const fetchGetCityWeather = ({ Authorization_KEY, CITY_NAME }) => {
-  return fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=${Authorization_KEY}&locationName=${CITY_NAME}`)
+const fetchGetCityWeather = ({ authorizationKey, cityName }) => {
+  return fetch(`https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=${authorizationKey}&locationName=${cityName}`)
     .then((res) => res.json())
     .then((data) => {
       const locationData = data.records.location[0];
@@ -56,7 +56,7 @@ const fetchGetCityWeather = ({ Authorization_KEY, CITY_NAME }) => {
     })
 }
 
-export default function useWeatherAPI({ Authorization_KEY, LOCATION_NAME, CITY_NAME }) {
+export default function useWeatherAPI({ authorizationKey, locationName, cityName }) {
   const [currentWeather, setWeather] = useState({
     locationName: "",
     description: "",
@@ -80,8 +80,8 @@ export default function useWeatherAPI({ Authorization_KEY, LOCATION_NAME, CITY_N
     });
     // 透過陣列解構拿到promise回傳的資料
     const [currentWeather, currentCityWeather] = await Promise.all([
-      fetchGetWeather({ Authorization_KEY, LOCATION_NAME }),
-      fetchGetCityWeather({ Authorization_KEY, CITY_NAME })
+      fetchGetWeather({ authorizationKey, locationName }),
+      fetchGetCityWeather({ authorizationKey, cityName })
     ]);
     // 透過物件解構灌入資料
     setWeather({
@@ -89,7 +89,7 @@ export default function useWeatherAPI({ Authorization_KEY, LOCATION_NAME, CITY_N
       ...currentCityWeather,
       isLoading: false
     });
-  }, [Authorization_KEY, LOCATION_NAME, CITY_NAME]);
+  }, [authorizationKey, locationName, cityName]);
 
   useEffect(() => {
     fetchData();
