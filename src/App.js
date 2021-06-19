@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import styled from '@emotion/styled';
 import { ThemeProvider } from '@emotion/react';
-import WeatherCard from './views/WeatherCard'
 import useWeatherAPI from './hooks/useWeatherAPI';
 import useMoment from './hooks/useMoment';
+import WeatherCard from './views/WeatherCard';
+import WeatherSetting from './views/WeatherSetting';
+import { findLocation } from './utils/helpers';
 
 const Container = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -13,7 +15,7 @@ const Container = styled.div`
   justify-content: center;
 `;
 
-// setup theme color start ==========
+// setup theme color ==========
 const theme = {
   light: {
     backgroundColor: '#ededed',
@@ -33,32 +35,57 @@ const theme = {
     textColor: '#cccccc',
   },
 };
-// setup theme color end ==========
 
 // weather API Info
-const Authorization_KEY = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
-const LOCATION_NAME = "臺中"; // 觀測站名稱
-const CITY_NAME = "臺中市";
+const authorizationKey = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
 
 function App() {
-  const [currentWeather, fetchData] = useWeatherAPI({
-    Authorization_KEY,
-    LOCATION_NAME,
-    CITY_NAME
-  })
+  const cityNameFromStorage = localStorage.getItem('cityName') || '彰化縣';
+  const [currentCity, setCurrentCity] = useState(cityNameFromStorage);
+  const handleCurrentCityChange = (currentCity) => {
+    setCurrentCity(currentCity)
+  }
+  const currentLocation = useMemo(() => findLocation(currentCity), [currentCity]);
+  // console.log(currentLocation);
+  // {cityName: "臺中市", locationName: "臺中", sunriseCityName: "臺中市"}
+  const { cityName, locationName, sunriseCityName } = currentLocation;
 
+  // custom hook start ================================
+  const [currentWeather, fetchData] = useWeatherAPI({
+    authorizationKey,
+    locationName,
+    cityName
+  });
   const [currentTheme, moment] = useMoment({
-    CITY_NAME
-  })
+    sunriseCityName
+  });
+  // custom hook end ================================
+
+  const [currentPage, setCurrentPage] = useState('WeatherCard');
+
+  const handleCurrentPageSwitch = (currentPage) => {
+    setCurrentPage(currentPage)
+  }
 
   return (
     <ThemeProvider theme={theme[currentTheme]}>
       <Container>
-        <WeatherCard
-          currentWeather={currentWeather}
-          moment={moment}
-          fetchData={fetchData}
-        />
+        {currentPage === 'WeatherCard' && (
+          <WeatherCard
+            cityName={cityName}
+            currentWeather={currentWeather}
+            moment={moment}
+            fetchData={fetchData}
+            handleCurrentPageSwitch={handleCurrentPageSwitch}
+          />
+        )}
+        {currentPage === 'WeatherSetting' && (
+          <WeatherSetting
+            cityName={cityName}
+            handleCurrentPageSwitch={handleCurrentPageSwitch}
+            handleCurrentCityChange={handleCurrentCityChange}
+          />
+        )}
       </Container>
     </ThemeProvider>
   );
