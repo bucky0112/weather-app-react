@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import { ThemeProvider } from '@emotion/react';
+import useLocation from './hooks/useLocation';
 import useWeatherAPI from './hooks/useWeatherAPI';
 import useMoment from './hooks/useMoment';
 import WeatherCard from './views/WeatherCard';
 import WeatherSetting from './views/WeatherSetting';
-import { findLocation } from './utils/helpers';
 
 const Container = styled.div`
   background-color: ${({ theme }) => theme.backgroundColor};
@@ -40,22 +40,15 @@ const theme = {
 const authorizationKey = "CWB-B27FB271-F097-42ED-8D99-67165F86E777";
 
 function App() {
-  const cityNameFromStorage = localStorage.getItem('cityName') || '彰化縣';
-  const [currentCity, setCurrentCity] = useState(cityNameFromStorage);
-  const handleCurrentCityChange = (currentCity) => {
-    setCurrentCity(currentCity)
-  }
-  const currentLocation = useMemo(() => findLocation(currentCity), [currentCity]);
-  // console.log(currentLocation);
-  // {cityName: "臺中市", locationName: "臺中", sunriseCityName: "臺中市"}
-  const { cityName, locationName, sunriseCityName } = currentLocation;
-
   // custom hook start ================================
+  const [cityName, locationName, sunriseCityName, handleCurrentCityChange] = useLocation({});
+
   const [currentWeather, fetchData] = useWeatherAPI({
     authorizationKey,
     locationName,
     cityName
   });
+
   const [currentTheme, moment] = useMoment({
     sunriseCityName
   });
@@ -66,7 +59,7 @@ function App() {
   const handleCurrentPageSwitch = (currentPage) => {
     setCurrentPage(currentPage)
   }
-
+  
   return (
     <ThemeProvider theme={theme[currentTheme]}>
       <Container>
