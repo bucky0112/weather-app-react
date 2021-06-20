@@ -59,7 +59,7 @@ function App() {
   const handleCurrentPageSwitch = (currentPage) => {
     setCurrentPage(currentPage)
   }
-  
+
   return (
     <ThemeProvider theme={theme[currentTheme]}>
       <Container>
